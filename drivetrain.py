@@ -4,6 +4,10 @@ import wpilib.drive
 import wpimath.controller
 import wpimath.kinematics
 import wpimath.units
+import rev
+import commands2
+
+
 
 import math
 
@@ -19,13 +23,18 @@ class Drivetrain:
     ENCODER_RESOLUTION = 4096  # counts per revolution
 
     def __init__(self):
-        leftLeader = wpilib.PWMSparkMax(11)
-        leftFollower = wpilib.PWMSparkMax(14)
-        rightLeader = wpilib.PWMSparkMax(12)
-        rightFollower = wpilib.PWMSparkMax(13)
+        leftLeader = rev.CANSparkMax(12, rev.CANSparkLowLevel.MotorType.kBrushless)
+        leftFollower = rev.CANSparkMax(13, rev.CANSparkLowLevel.MotorType.kBrushless)
+        rightLeader = rev.CANSparkMax(11, rev.CANSparkLowLevel.MotorType.kBrushless)
+        rightFollower = rev.CANSparkMax(14, rev.CANSparkLowLevel.MotorType.kBrushless)
+        ramprate = 0.6
+        leftLeader.setOpenLoopRampRate(ramprate)
+        leftFollower.setOpenLoopRampRate(ramprate)
+        rightLeader.setOpenLoopRampRate(ramprate)
+        rightFollower.setOpenLoopRampRate(ramprate)
 
-        self.leftEncoder = wpilib.Encoder(0, 1)
-        self.rightEncoder = wpilib.Encoder(2, 3)
+        self.leftEncoder = wpilib.Encoder(12, 13)
+        self.rightEncoder = wpilib.Encoder(11, 14)
 
         self.leftGroup = wpilib.MotorControllerGroup(leftLeader, leftFollower)
         self.rightGroup = wpilib.MotorControllerGroup(rightLeader, rightFollower)
@@ -47,7 +56,9 @@ class Drivetrain:
         # We need to invert one side of the drivetrain so that positive voltages
         # result in both sides moving forward. Depending on how your robot's
         # gearbox is constructed, you might have to invert the left side instead.
-        self.rightGroup.setInverted(True)
+        # self.rightGroup.setInverted(True)
+        rightLeader.setInverted(True)
+        rightFollower.setInverted(True)
 
         # Set the distance per pulse for the drive encoders. We can simply use the
         # distance traveled for one rotation of the wheel divided by the encoder
